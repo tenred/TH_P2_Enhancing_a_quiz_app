@@ -19,12 +19,15 @@ class ViewController: UIViewController {
     
     var gameSound: SystemSoundID = 0
     
+    /*
     let trivia: [[String : String]] = [
         ["Question": "Only female koalas can whistle", "Answer": "False"],
         ["Question": "Blue whales are technically whales", "Answer": "True"],
         ["Question": "Camels are cannibalistic", "Answer": "False"],
         ["Question": "All ducks are birds", "Answer": "True"]
     ]
+    */
+    let trivia = QuestionData()
     
     @IBOutlet weak var questionField: UILabel!
     @IBOutlet weak var trueButton: UIButton!
@@ -38,6 +41,7 @@ class ViewController: UIViewController {
         // Start game
         playGameStartSound()
         displayQuestion()
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -46,9 +50,10 @@ class ViewController: UIViewController {
     }
     
     func displayQuestion() {
-        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(trivia.count)
-        let questionDictionary = trivia[indexOfSelectedQuestion]
-        questionField.text = questionDictionary["Question"]
+        //let questionDictionary = QuestionData()
+        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(trivia.getTotalQuestionCount())
+
+        questionField.text = trivia.getQuestion(atIndex: indexOfSelectedQuestion)
         playAgainButton.hidden = true
     }
     
@@ -68,8 +73,9 @@ class ViewController: UIViewController {
         // Increment the questions asked counter
         questionsAsked += 1
         
-        let selectedQuestionDict = trivia[indexOfSelectedQuestion]
-        let correctAnswer = selectedQuestionDict["Answer"]
+        //let selectedQuestionDict = trivia.getQuestion(atIndex: indexOfSelectedQuestion)
+        let correctAnswer = trivia.getAnswer(atIndex: indexOfSelectedQuestion)
+
         
         if (sender === trueButton &&  correctAnswer == "True") || (sender === falseButton && correctAnswer == "False") {
             correctQuestions += 1
@@ -127,4 +133,7 @@ class ViewController: UIViewController {
         AudioServicesPlaySystemSound(gameSound)
     }
 }
+
+
+
 
