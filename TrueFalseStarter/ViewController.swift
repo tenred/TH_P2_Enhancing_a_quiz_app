@@ -11,24 +11,11 @@ import GameKit
 import AudioToolbox
 
 class ViewController: UIViewController {
-    
-    let questionsPerRound = 4
-    var questionsAsked = 0
-    var correctQuestions = 0
-    var indexOfSelectedQuestion: Int = 0
+
     
     var gameSound: SystemSoundID = 0
-    
-    /*
-    let trivia: [[String : String]] = [
-        ["Question": "Only female koalas can whistle", "Answer": "False"],
-        ["Question": "Blue whales are technically whales", "Answer": "True"],
-        ["Question": "Camels are cannibalistic", "Answer": "False"],
-        ["Question": "All ducks are birds", "Answer": "True"]
-    ]
-    */
-    let trivia = QuestionData()
-    
+    let triviaGame = TriviaGameFlow(questionsPerRound: 2)
+
     @IBOutlet weak var questionField: UILabel!
     @IBOutlet weak var trueButton: UIButton!
     @IBOutlet weak var falseButton: UIButton!
@@ -38,6 +25,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         loadGameStartSound()
+        
         // Start game
         playGameStartSound()
         displayQuestion()
@@ -50,64 +38,58 @@ class ViewController: UIViewController {
     }
     
     func displayQuestion() {
-        //let questionDictionary = QuestionData()
-        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(trivia.getTotalQuestionCount())
+        
+        questionField.text = triviaGame.getTriviaQuestion()
+        changeButtonState(triviaGame.isGameInProgress())
+        
+ }
 
-        questionField.text = trivia.getQuestion(atIndex: indexOfSelectedQuestion)
-        playAgainButton.hidden = true
-    }
-    
     func displayScore() {
-        // Hide the answer buttons
-        trueButton.hidden = true
-        falseButton.hidden = true
         
-        // Display play again button
-        playAgainButton.hidden = false
+        changeButtonState(triviaGame.isGameInProgress())
+        questionField.text = "Way to go!\nYou got \(triviaGame.getScore().CorrectQuestions) out of \(triviaGame.getScore().TotalQuestions) correct!"
+        }
+    
+    func nextRound() {
         
-        questionField.text = "Way to go!\nYou got \(correctQuestions) out of \(questionsPerRound) correct!"
+        let continueGame = triviaGame.isGameInProgress()
+        if continueGame {displayQuestion()} else {displayScore()}
         
     }
     
     @IBAction func checkAnswer(sender: UIButton) {
-        // Increment the questions asked counter
-        questionsAsked += 1
         
-        //let selectedQuestionDict = trivia.getQuestion(atIndex: indexOfSelectedQuestion)
-        let correctAnswer = trivia.getAnswer(atIndex: indexOfSelectedQuestion)
-
-        
-        if (sender === trueButton &&  correctAnswer == "True") || (sender === falseButton && correctAnswer == "False") {
-            correctQuestions += 1
-            questionField.text = "Correct!"
-        } else {
-            questionField.text = "Sorry, wrong answer!"
-        }
-        
+        let resultString = triviaGame.isAnswerCorrect((sender.titleLabel?.text)!).caption
+        questionField.text = resultString
         loadNextRoundWithDelay(seconds: 2)
     }
     
-    func nextRound() {
-        if questionsAsked == questionsPerRound {
-            // Game is over
-            displayScore()
-        } else {
-            // Continue game
-            displayQuestion()
-        }
-    }
     
     @IBAction func playAgain() {
         // Show the answer buttons
-        trueButton.hidden = false
-        falseButton.hidden = false
-        
-        questionsAsked = 0
-        correctQuestions = 0
+
+        changeButtonState(triviaGame.isGameInProgress())
+        triviaGame.playAgain()
         nextRound()
     }
     
+    
+    func changeButtonState(gameInProgress: Bool) {
+        
+        switch gameInProgress {
+        
+        case true:
+            trueButton.hidden = false
+            falseButton.hidden = false
+            playAgainButton.hidden = true
 
+        case false:
+            trueButton.hidden = true
+            falseButton.hidden = true
+            playAgainButton.hidden = false
+
+        }
+    }
     
     // MARK: Helper Methods
     
