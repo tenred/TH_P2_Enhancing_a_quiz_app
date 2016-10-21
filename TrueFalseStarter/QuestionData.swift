@@ -13,16 +13,19 @@ struct QuestionData {
     //let questionIndex: Int
     
     private let rawTriviaData: [[String : String]] = [
-        ["Question": "Only female koalas can whistle?", "Answer": "False", "Options" : "True|False"],
-        ["Question": "Is Batman is Awesome?", "Answer": "True","Options" : "True|False"],
+        ["Question": "Only female koalas can whistle?", "Answer": "False", "Options" : "111|222"],
+        ["Question": "Is Batman is Awesome?", "Answer": "True","Options" : "555|444"],
         ["Question": "Camels are cannibalistic", "Answer": "False","Options" : "True|False"],
-        ["Question": "All ducks are birds", "Answer": "True", "Options" : "True|False"]
+        ["Question": "All ducks are birds", "Answer": "True", "Options" : "True|False"],
+        ["Question": "Robin is Batman's Sidekick", "Answer": "True", "Options" : "Yum|Cha"],
+        ["Question": "Joke is Batman's Enemy?", "Answer": "True", "Options" : "True|False"]
     ]
 
     func getQuestion(atIndex Index: Int) -> String {
         //Function returns individual Question String at an Index in Trivia Array
-
+        
         let triviaQuestion = rawTriviaData[Index]
+        print(getAnswerOptions(atIndex: Index))
         return triviaQuestion["Question"]!
     }
     
@@ -45,6 +48,7 @@ struct QuestionData {
         
         return arrAnswerOptions!
     }
+    
     
 } // End of Struct QuestionData
 

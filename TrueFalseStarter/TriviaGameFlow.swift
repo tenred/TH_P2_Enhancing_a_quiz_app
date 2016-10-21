@@ -15,7 +15,8 @@ class TriviaGameFlow {
     
     var questionsAsked = 0
     var correctQuestions = 0
-    var indexOfSelectedQuestion: Int = 0
+    var indexOfSelectedQuestion = 0
+    var questionHistory: [Int] = []
 
     init(questionsPerRound: Int) {
         self.questionsPerRound = questionsPerRound
@@ -23,11 +24,30 @@ class TriviaGameFlow {
     }
     
     func getTriviaQuestion() -> String{
-    
-        indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(triviaQuestion.getTotalQuestionCount())
+        
+        var questionAskedBefore: Bool
+
+        repeat {
+            
+            questionAskedBefore = false
+            indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(triviaQuestion.getTotalQuestionCount())
+            
+            print("Catalogue: \(questionHistory) | Index: \(indexOfSelectedQuestion)")
+            
+            if questionHistory != [] {
+               for qn in questionHistory{
+                    if qn == indexOfSelectedQuestion {
+                        print("Duplicate Found")
+                        questionAskedBefore = true
+                    }
+                }
+            }
+            
+        } while questionAskedBefore == true
+        
+        questionHistory.insert(indexOfSelectedQuestion, atIndex: questionHistory.endIndex)
         return triviaQuestion.getQuestion(atIndex: indexOfSelectedQuestion)
     }
-    
     
     func getScore() -> (CorrectQuestions: Int, TotalQuestions: Int){
     
@@ -61,9 +81,17 @@ class TriviaGameFlow {
         }
     }
     
+    func returnQuestionOptions(OptionNo: Int) -> String {
+        
+        let arrAnswerOptions = triviaQuestion.getAnswerOptions(atIndex: indexOfSelectedQuestion)
+        return arrAnswerOptions[OptionNo]
+    }
+    
     func playAgain() {
+        
         questionsAsked = 0
         correctQuestions = 0
+        questionHistory.removeAll()
     }
 }
 

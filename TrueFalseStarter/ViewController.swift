@@ -14,7 +14,9 @@ class ViewController: UIViewController {
 
     
     var gameSound: SystemSoundID = 0
-    let triviaGame = TriviaGameFlow(questionsPerRound: 2)
+    let triviaGame = TriviaGameFlow(questionsPerRound: 4)
+    var gameAudio = AudioControl()
+    
 
     @IBOutlet weak var questionField: UILabel!
     @IBOutlet weak var trueButton: UIButton!
@@ -24,10 +26,14 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadGameStartSound()
+        //loadGameStartSound()
         
         // Start game
-        playGameStartSound()
+        // DEPRICTAING
+        //playGameStartSound()
+        
+        
+        gameAudio.playGameStartSound()
         displayQuestion()
         
     }
@@ -106,10 +112,12 @@ class ViewController: UIViewController {
     }
     
     func loadGameStartSound() {
+        
         let pathToSoundFile = NSBundle.mainBundle().pathForResource("GameSound", ofType: "wav")
         let soundURL = NSURL(fileURLWithPath: pathToSoundFile!)
         AudioServicesCreateSystemSoundID(soundURL, &gameSound)
-    }
+        
+ }
     
     func playGameStartSound() {
         AudioServicesPlaySystemSound(gameSound)

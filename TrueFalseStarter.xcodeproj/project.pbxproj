@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		110E1DC61DB6F8D80053D28B /* QuestionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 110E1DC51DB6F8D80053D28B /* QuestionData.swift */; };
 		11BB6F3A1DB830E600E402D1 /* TriviaGameFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BB6F391DB830E600E402D1 /* TriviaGameFlow.swift */; };
+		11BB6F3C1DB88F9A00E402D1 /* AudioContol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11BB6F3B1DB88F9A00E402D1 /* AudioContol.swift */; };
 		97093D3C1C913506001275BC /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97093D3B1C913506001275BC /* AppDelegate.swift */; };
 		97093D3E1C913506001275BC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97093D3D1C913506001275BC /* ViewController.swift */; };
 		97093D411C913506001275BC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97093D3F1C913506001275BC /* Main.storyboard */; };
@@ -20,6 +21,7 @@
 /* Begin PBXFileReference section */
 		110E1DC51DB6F8D80053D28B /* QuestionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuestionData.swift; sourceTree = "<group>"; };
 		11BB6F391DB830E600E402D1 /* TriviaGameFlow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TriviaGameFlow.swift; sourceTree = "<group>"; };
+		11BB6F3B1DB88F9A00E402D1 /* AudioContol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AudioContol.swift; sourceTree = "<group>"; };
 		97093D381C913506001275BC /* TrueFalseStarter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrueFalseStarter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		97093D3B1C913506001275BC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		97093D3D1C913506001275BC /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -27,7 +29,7 @@
 		97093D421C913506001275BC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97093D451C913506001275BC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97093D471C913506001275BC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		97093D521C932116001275BC /* GameSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = GameSound.wav; sourceTree = "<group>"; };
+		97093D521C932116001275BC /* GameSound.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; name = GameSound.wav; path = TrueFalseStarter/GameSound.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,11 +43,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		11BB6F3D1DB8915300E402D1 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				97093D521C932116001275BC /* GameSound.wav */,
+			);
+			name = Audio;
+			sourceTree = "<group>";
+		};
 		97093D2F1C913506001275BC = {
 			isa = PBXGroup;
 			children = (
 				97093D3A1C913506001275BC /* TrueFalseStarter */,
 				97093D391C913506001275BC /* Products */,
+				11BB6F3D1DB8915300E402D1 /* Audio */,
 			);
 			sourceTree = "<group>";
 		};
@@ -66,9 +77,9 @@
 				97093D421C913506001275BC /* Assets.xcassets */,
 				97093D441C913506001275BC /* LaunchScreen.storyboard */,
 				97093D471C913506001275BC /* Info.plist */,
-				97093D521C932116001275BC /* GameSound.wav */,
 				110E1DC51DB6F8D80053D28B /* QuestionData.swift */,
 				11BB6F391DB830E600E402D1 /* TriviaGameFlow.swift */,
+				11BB6F3B1DB88F9A00E402D1 /* AudioContol.swift */,
 			);
 			path = TrueFalseStarter;
 			sourceTree = "<group>";
@@ -149,6 +160,7 @@
 				11BB6F3A1DB830E600E402D1 /* TriviaGameFlow.swift in Sources */,
 				97093D3E1C913506001275BC /* ViewController.swift in Sources */,
 				110E1DC61DB6F8D80053D28B /* QuestionData.swift in Sources */,
+				11BB6F3C1DB88F9A00E402D1 /* AudioContol.swift in Sources */,
 				97093D3C1C913506001275BC /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
