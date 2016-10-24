@@ -13,23 +13,22 @@ struct QuestionData {
     //let questionIndex: Int
     
     private let rawTriviaData: [[String : String]] = [
-        ["Question": "Only female koalas can whistle?", "Answer": "False", "Options" : "111|222"],
-        ["Question": "Is Batman is Awesome?", "Answer": "True","Options" : "555|444"],
-        ["Question": "Camels are cannibalistic", "Answer": "False","Options" : "True|False"],
-        ["Question": "All ducks are birds", "Answer": "True", "Options" : "True|False"],
-        ["Question": "Robin is Batman's Sidekick", "Answer": "True", "Options" : "Yum|Cha"],
-        ["Question": "Joke is Batman's Enemy?", "Answer": "True", "Options" : "True|False"]
+        ["Question": "Only female koalas can whistle?", "Answer": "a", "Options" : "a|b|c|d"],
+        ["Question": "Is Batman is Awesome?", "Answer": "e","Options" : "e|f|g|h"],
+        ["Question": "Camels are cannibalistic", "Answer": "i","Options" : "i|j|k|l"],
+        ["Question": "All ducks are birds", "Answer": "m", "Options" : "m|n|o|p"],
+        ["Question": "Robin is Batman's Sidekick", "Answer": "q", "Options" : "q|r|s|t"],
+        ["Question": "Joke is Batman's Enemy?", "Answer": "u", "Options" : "u|v|w|x"]
     ]
 
-    func getQuestion(atIndex Index: Int) -> String {
+    func question(atIndex Index: Int) -> String {
         //Function returns individual Question String at an Index in Trivia Array
         
         let triviaQuestion = rawTriviaData[Index]
-        print(getAnswerOptions(atIndex: Index))
         return triviaQuestion["Question"]!
     }
     
-    func getAnswer(atIndex Index: Int) -> String {
+    func answer(atIndex Index: Int) -> String {
         //Function returns individual Answer String at an Index in Trivia Array
         
         let triviaAnswer = rawTriviaData[Index]
@@ -41,7 +40,7 @@ struct QuestionData {
         return rawTriviaData.count
     }
     
-    func getAnswerOptions(atIndex Index: Int) -> Array<String> {
+    func answerOptions(atIndex Index: Int) -> Array<String> {
         
         let answerOptions = rawTriviaData[Index]
         let arrAnswerOptions = answerOptions["Options"]?.componentsSeparatedByString("|")

@@ -14,16 +14,46 @@ struct AudioControl {
     
     var gameSound: SystemSoundID = 0
     
+    let startGameAudioFile = NSBundle.mainBundle().pathForResource("StartGame", ofType: "wav")
+    let endGameAudioFile = NSBundle.mainBundle().pathForResource("EndGame", ofType: "wav")
+    let correctAnswAudioFile = NSBundle.mainBundle().pathForResource("CorrectAnswer", ofType: "wav")
+    let wrongAnswAudioFile = NSBundle.mainBundle().pathForResource("WrongAnswer", ofType: "wav")
+
     init() {
-    let pathToSoundFile = NSBundle.mainBundle().pathForResource("GameSound", ofType: "wav")
-    let soundURL = NSURL(fileURLWithPath: pathToSoundFile!)
+        let pathToSoundFile = NSBundle.mainBundle().pathForResource("StartGame", ofType: "wav")
+        let soundURL = NSURL(fileURLWithPath: pathToSoundFile!)
+        AudioServicesCreateSystemSoundID(soundURL, &gameSound)
+    }
+    
+  /*  func loadGameStartSound(pathToSoundFile: NSBundle) {
+        
+        //let pathToSoundFile = NSBundle.mainBundle().pathForResource("GameSound", ofType: "wav")
+        let soundURL = NSURL(fileURLWithPath: pathToSoundFile!)
         AudioServicesCreateSystemSoundID(soundURL, &gameSound)
         
     }
+*/
+  
+
+
     
     
-    func playGameStartSound() {
+    func playStartSound() {
+
         AudioServicesPlaySystemSound(gameSound)
+    }
+    
+    
+    func playCorrectAnswer(){
+        
+    }
+    
+    func playWrongAnswer(){
+        
+    }
+    
+    func finishGame(){
+        
     }
     
 }

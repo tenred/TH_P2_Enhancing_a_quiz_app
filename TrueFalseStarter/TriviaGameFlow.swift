@@ -10,13 +10,13 @@ import GameKit
 
 class TriviaGameFlow {
     
-    let questionsPerRound: Int
-    let triviaQuestion = QuestionData()
+    private let questionsPerRound: Int
+    private let triviaQuestion = QuestionData()
     
-    var questionsAsked = 0
-    var correctQuestions = 0
-    var indexOfSelectedQuestion = 0
-    var questionHistory: [Int] = []
+    private var questionsAsked = 0
+    private var correctQuestions = 0
+    private var indexOfSelectedQuestion = 0
+    private var questionHistory: [Int] = []
 
     init(questionsPerRound: Int) {
         self.questionsPerRound = questionsPerRound
@@ -32,12 +32,9 @@ class TriviaGameFlow {
             questionAskedBefore = false
             indexOfSelectedQuestion = GKRandomSource.sharedRandom().nextIntWithUpperBound(triviaQuestion.getTotalQuestionCount())
             
-            print("Catalogue: \(questionHistory) | Index: \(indexOfSelectedQuestion)")
-            
             if questionHistory != [] {
                for qn in questionHistory{
                     if qn == indexOfSelectedQuestion {
-                        print("Duplicate Found")
                         questionAskedBefore = true
                     }
                 }
@@ -46,7 +43,7 @@ class TriviaGameFlow {
         } while questionAskedBefore == true
         
         questionHistory.insert(indexOfSelectedQuestion, atIndex: questionHistory.endIndex)
-        return triviaQuestion.getQuestion(atIndex: indexOfSelectedQuestion)
+        return triviaQuestion.question(atIndex: indexOfSelectedQuestion)
     }
     
     func getScore() -> (CorrectQuestions: Int, TotalQuestions: Int){
@@ -54,23 +51,21 @@ class TriviaGameFlow {
         return (correctQuestions, questionsPerRound)
     }
     
-    func isAnswerCorrect(submittedAnswer: String) -> (result: Bool, caption: String) {
+    func isAnswerCorrect(submittedAnswer: String) -> Bool {
         // Increment the questions asked counter
         questionsAsked += 1
-        let correctAnswer = triviaQuestion.getAnswer(atIndex: indexOfSelectedQuestion)
+        let correctAnswer = triviaQuestion.answer(atIndex: indexOfSelectedQuestion)
         
         if submittedAnswer == correctAnswer {
             correctQuestions += 1
-            return (true, "Correct Answer")
+            return true
             
         } else {
-            return (false, "Sorry, Bad Luck")
+            return false
         }
-        
-        //loadNextRoundWithDelay(seconds: 2)
     }
     
-    func isGameInProgress() -> Bool {
+    func isGameInPlay() -> Bool {
         
         if questionsAsked == questionsPerRound {
             // Game is over
@@ -81,9 +76,9 @@ class TriviaGameFlow {
         }
     }
     
-    func returnQuestionOptions(OptionNo: Int) -> String {
+    func questionOptions(OptionNo: Int) -> String {
         
-        let arrAnswerOptions = triviaQuestion.getAnswerOptions(atIndex: indexOfSelectedQuestion)
+        let arrAnswerOptions = triviaQuestion.answerOptions(atIndex: indexOfSelectedQuestion)
         return arrAnswerOptions[OptionNo]
     }
     
