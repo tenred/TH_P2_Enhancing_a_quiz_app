@@ -12,29 +12,33 @@ import AudioToolbox
 
 class ViewController: UIViewController {
 
-    
-    var gameSound: SystemSoundID = 0
-    let triviaGame = TriviaGameFlow(questionsPerRound: 5)
+    let triviaGame = TriviaGameFlow(questionsPerRound: 10)
     var gameAudio = AudioControl()
+    let theTimer = CountdownTimer(timerInSeconds: 15)
+    var lightningModeEnabled = false
+    var timerInterval: NSTimer?
     
-
     @IBOutlet weak var resultField: UILabel!
     @IBOutlet weak var questionField: UILabel!
+    @IBOutlet weak var timerField: UILabel!
     @IBOutlet weak var playAgainButton: UIButton!
     
     @IBOutlet weak var option1: UIButton!
     @IBOutlet weak var option2: UIButton!
     @IBOutlet weak var option3: UIButton!
     @IBOutlet weak var option4: UIButton!
+    @IBOutlet var arrOptionButtons: [UIButton]!
+    
     @IBOutlet weak var nextQuestionButton: UIButton!
+    @IBOutlet weak var lightningModeButton: UIButton!
+    
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         gameAudio.playStartSound()
-        
-        changeUIState("newGame", buttonPressed: nil)
+        changeUIState("newGame", selectedButton: nil)
         displayQuestion()
         
     }
@@ -45,158 +49,250 @@ class ViewController: UIViewController {
     }
     
     func displayQuestion() {
+        //Description: displays individual question from triviaGame class
+        
+        //Checks if user has selected Lightning Mode.
+        //If so, display counter and commence.
+        if lightningModeEnabled{
+            displayTimerCountdown(timerInterval!)
+            lightningMode()
+        }
         
         questionField.text = triviaGame.getTriviaQuestion()
-        //changeButtonState(triviaGame.isGameInProgress())
-        changeUIState("nextRound", buttonPressed: nil)
+        changeUIState("nextRound", selectedButton: nil)
         displayButtonOptions()
+        
  }
 
     func displayButtonOptions(){
+        //Description: Get the different answer option and display on the option UIButtons.
         
-        option1.setTitle(triviaGame.questionOptions(0), forState: .Normal)
-        option2.setTitle(triviaGame.questionOptions(1), forState: .Normal)
-        option3.setTitle(triviaGame.questionOptions(2), forState: .Normal)
-        option4.setTitle(triviaGame.questionOptions(3), forState: .Normal)
-
+        var optionIndex = 0
+        
+        //Loop through Outlet Collection of option buttons arrOptionButtons
+        for button in arrOptionButtons{
+            button.setTitle(triviaGame.questionOptions(optionIndex), forState: .Normal)
+            optionIndex += 1
+        }
     }
     
     func displayScore() {
+        //Description: On completion of the game, display the overall score to the user including changeing the UI state and Game Audio.
         
-        changeUIState("EndOfGame", buttonPressed: nil)
+        changeUIState("EndOfGame", selectedButton: nil)
         questionField.text = "Way to go!\nYou got \(triviaGame.getScore().CorrectQuestions) out of \(triviaGame.getScore().TotalQuestions) correct!"
-        }
+        gameAudio.playFinishGameSound()
+    }
     
-    func changeUIState(gameState: String, buttonPressed: UIButton?) {
+    
+    func displayCorrectAnswer() {
+        //Description: If the user submits a wrong answer, highlight the button that displays the correct answer.
+        
+        let correctAnswerAtIndex = triviaGame.correctAnswerAtIndex()
+        
+        for button in arrOptionButtons {
+            if correctAnswerAtIndex == Int(button.accessibilityIdentifier!)! {
+                changeUIState("showCorrect", selectedButton: button)
+            }
+        }
+    }
+    
+
+    @IBAction func nextRound() {
+        
+        //Description: Checks if the game is still in play by comparing the number of questions asked with the total question in round.
+        //Determine is to proceed to next question or end game.
+        
+        let continueGame = triviaGame.isGameInPlay()
+        
+        if continueGame {
+            displayQuestion()
+        } else {
+            displayScore()
+        }
+    }
+    
+    @IBAction func lightningMode() {
+        //Description: Triggers lightning mode when triggered.
+        //NSTimer interval triggers displayTimerCountdown
+        
+        lightningModeEnabled = true
+        timerField.text = String("Lightning Mode is ON")
+        changeUIState("timerOn", selectedButton: nil)
+
+        timerInterval = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: #selector(ViewController.displayTimerCountdown(_:)), userInfo: nil, repeats: true)
+
+    }
+    
+    func displayTimerCountdown(timer: NSTimer){
+        //Description: interates the countdown timer;
+        // Timer behaviour is managed by class CountdownTimer
+        
+        if theTimer.isActive() {
+            timerField.text = String("Count down: \(theTimer.countingDown())")
+
+        } else {
+            timerField.text = "Out of Time"
+            theTimer.resetTime()
+            timerInterval!.invalidate()
+            checkAnswer(nil)
+        }
+    }
+    
+    
+    @IBAction func checkAnswer(sender: UIButton?) {
+        //Description: Calls TriviaGameFlow class to confirm if submitted answer is correct.
+        //Play Audio depending on Correct or Incorrect Answer.
+        
+        let submittedAnswer = sender?.titleLabel!.text
+        
+        changeUIState("questionAnswered", selectedButton: sender)
+        
+        //Check is lightning mode is on.
+        //If so, stop timer.
+        if lightningModeEnabled{
+            timerInterval!.invalidate()
+            theTimer.resetTime()
+        }
+
+        
+        if submittedAnswer != nil && triviaGame.isAnswerCorrect(submittedAnswer) {
+            //Answer is Correct
+            resultField.text = "Correct."
+            changeUIState("correct", selectedButton: sender)
+            gameAudio.playCorrectAnswerSound()
+            
+        } else {
+            //Answer is wrong
+            resultField.text = "Sorry, that's not it."
+            changeUIState("wrong", selectedButton: sender)
+            displayCorrectAnswer()
+            gameAudio.playWrongAnswerSound()
+            
+        }
+    }
+
+    
+    @IBAction func playAgain() {
+        //Description: Play again button will remain hidden until game is ended.
+        //When triggered game will re-initiate and play again.
+        changeUIState("newGame", selectedButton: playAgainButton)
+        changeUIState("timerOff", selectedButton: playAgainButton)
+
+        triviaGame.playAgain()
+        theTimer.resetLightningMode()
+        lightningModeEnabled = false
+        nextRound()
+        
+    }
+    
+    func changeUIState(gameState: String, selectedButton: UIButton?) {
+        //Description: Consolidate all various UI state changes into a method.
+        
+        //Default color scheme's
+        let defaultButtonBGColor = UIColor.init(red: 12/255, green: 120/255, blue: 148/255, alpha: 1.0)
+        let correctButtonBGColor = UIColor.greenColor()
+        let wrongButtonBGColor = UIColor.redColor()
+        let answerButtonBGColor = UIColor.greenColor()
+        let defaultTextColor = UIColor.whiteColor()
+        let wrongAnswerTextColor = UIColor.orangeColor()
+        let correctAnswerTextColor = UIColor.greenColor()
+        
+        
+        //Switch statement to change UI based on events within the trivia game.
         
         switch gameState {
             
         case "newGame":
-            option1.hidden = false
-            option2.hidden = false
-            option3.hidden = false
-            option4.hidden = false
+            //UI attributes for a New Game.
+            changeOptionButtons(false, enabled: true, alpha: 1.0, txtcolor: defaultTextColor, bgcolor: defaultButtonBGColor, corner: 7)
             
-            option1.layer.cornerRadius = 7
-            option2.layer.cornerRadius = 7
-            option3.layer.cornerRadius = 7
-            option4.layer.cornerRadius = 7
             playAgainButton.layer.cornerRadius = 7
             nextQuestionButton.layer.cornerRadius = 7
             
             playAgainButton.hidden = true
-            resultField.hidden = true
             nextQuestionButton.hidden = true
+            
+            resultField.hidden = true
+            timerField.hidden = true
+            
             
         case "nextRound":
-            option1.enabled = true
-            option2.enabled = true
-            option3.enabled = true
-            option4.enabled = true
-
-            option1.alpha = 1.0
-            option2.alpha = 1.0
-            option3.alpha = 1.0
-            option4.alpha = 1.0
+            //UI attributes for the next question within a game
+            changeOptionButtons(false, enabled: true, alpha: 1.0, txtcolor: nil, bgcolor: defaultButtonBGColor, corner: nil)
             
             resultField.hidden = true
             nextQuestionButton.hidden = true
+
             
         case "questionAnswered":
-            option1.enabled = false
-            option2.enabled = false
-            option3.enabled = false
-            option4.enabled = false
+            //UI Attributes when an option button/answer has been submitted.
+            changeOptionButtons(false, enabled: false, alpha: 0.3, txtcolor: nil, bgcolor: nil, corner: nil)
+            selectedButton?.enabled = true
+            selectedButton?.alpha = 1.0
             
-            option1.alpha = 0.3
-            option2.alpha = 0.3
-            option3.alpha = 0.3
-            option4.alpha = 0.3
-            
-            buttonPressed?.enabled = true
-            buttonPressed?.alpha = 1.0
-
             resultField.hidden = false
             nextQuestionButton.hidden = false
+            //lightningModeButton.enabled = false
+            
+            
+        case "correct":
+            //UI Attribute when a correct answer has been submitted.
+            selectedButton?.backgroundColor = correctButtonBGColor
+            resultField.textColor = correctAnswerTextColor
+            
+        case "wrong":
+            // UI Attribute when a wrong answer has been submitted.
+            selectedButton?.backgroundColor = wrongButtonBGColor
+            resultField.textColor = wrongAnswerTextColor
+            
+        case "showCorrect":
+            //UI Attribute to show the correct answer if a wrong answer has been selected.
+            selectedButton?.alpha = 1.0
+            selectedButton?.backgroundColor = answerButtonBGColor
+            selectedButton?.setTitleColor(defaultTextColor, forState: .Normal)
+            
+        case "timerOn":
+            //UI Attribute when Lightning mode has been selected.
+            timerField.hidden = false
+            lightningModeButton.enabled = false
+            
+            
+        case "timerOff":
+            //UI Attribute when Lightning mode has been selected.
+            timerField.hidden = true
+            lightningModeButton.enabled = true
             
         case "EndOfGame":
-            option1.hidden = true
-            option2.hidden = true
-            option3.hidden = true
-            option4.hidden = true
+            //UI Attribute when the game has finished all question.
+            
+            changeOptionButtons(true, enabled: false, alpha: 0.0, txtcolor: nil, bgcolor: nil, corner: nil)
             playAgainButton.hidden = false
             resultField.hidden = true
+            timerField.hidden = true
             nextQuestionButton.hidden = true
             
         default:
             break
         }
-    }
-    
-    @IBAction func nextRound() {
-        
-        let continueGame = triviaGame.isGameInPlay()
-        if continueGame {
-            displayQuestion()
-        } else {displayScore()}
         
     }
     
-    @IBAction func checkAnswer(sender: UIButton) {
+    func changeOptionButtons(hidden: Bool, enabled: Bool, alpha: CGFloat, txtcolor: UIColor?, bgcolor: UIColor?, corner: CGFloat?){
+        //Description: Rotates through the array of OptionButtons and applies UI Changes.
         
-        changeUIState("questionAnswered", buttonPressed: sender)
-        
-        if triviaGame.isAnswerCorrect((sender.titleLabel?.text)!) {
-            resultField.text = "Correct."
-            resultField.textColor = UIColor.greenColor()
-        } else {
-            resultField.text = "Sorry, that't not it."
-            resultField.textColor = UIColor.orangeColor()
-        }
-        
-        //loadNextRoundWithDelay(seconds: 2)
-    }
-    
-    
-    @IBAction func playAgain() {
-        // Show the answer buttons
-
-        changeUIState("newGame", buttonPressed: playAgainButton)
-        triviaGame.playAgain()
-        nextRound()
-    }
-    
-    
-
-/*
-    // MARK: Helper Methods
-    
-    func loadNextRoundWithDelay(seconds seconds: Int) {
-        // Converts a delay in seconds to nanoseconds as signed 64 bit integer
-        let delay = Int64(NSEC_PER_SEC * UInt64(seconds))
-        // Calculates a time value to execute the method given current time and delay
-        let dispatchTime = dispatch_time(DISPATCH_TIME_NOW, delay)
-        
-        // Executes the nextRound method at the dispatch time on the main queue
-        dispatch_after(dispatchTime, dispatch_get_main_queue()) {
-            self.nextRound()
+        for button in arrOptionButtons{
+            button.hidden = hidden
+            button.enabled = enabled
+            button.alpha = alpha
+            if (bgcolor != nil) {button.backgroundColor = bgcolor!}
+            if (corner != nil){button.layer.cornerRadius = corner!}
+            if (txtcolor != nil){button.setTitleColor(txtcolor, forState: .Normal)}
         }
     }
     
-    func loadGameStartSound() {
-        
-        let pathToSoundFile = NSBundle.mainBundle().pathForResource("GameSound", ofType: "wav")
-        let soundURL = NSURL(fileURLWithPath: pathToSoundFile!)
-        AudioServicesCreateSystemSoundID(soundURL, &gameSound)
-        
- }
     
-    func playGameStartSound() {
-        AudioServicesPlaySystemSound(gameSound)
-    }
- */
-    
-}
+} //End of ViewController.
 
 
 
